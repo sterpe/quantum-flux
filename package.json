@@ -1,0 +1,15 @@
+{
+  "name": "flux",
+  "version": "0.0.0",
+  "description": "",
+  "main": "store.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "Copyright 2014, the Rubicon Project.",
+  "dependencies": {
+    "lodash": "^2.4.1",
+    "q": "^1.0.1"
+  }
+}
