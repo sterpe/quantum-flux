@@ -10,6 +10,7 @@
   "license": "Copyright 2014, the Rubicon Project.",
   "dependencies": {
     "lodash": "^2.4.1",
-    "q": "^1.0.1"
+    "q": "^1.0.1",
+    "node-uuid": "^1.4.1"
   }
 }
