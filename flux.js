@@ -12,7 +12,9 @@ var flux = new Flux();
 var Store = flux.Store;
 
 var store = new Store();
-var store2 = new Store();
+var store2 = new Store({
+  customSomething: "FOO BAR BAZZ"
+});
 
 store.register(function (action) {
   
@@ -25,9 +27,6 @@ store.register(function (action) {
 
 
 store2.register(function (action) {
-  this.waitFor(store, _.bind(function (action) {
-    console.log('waiting....done.');
-  }, this));
   console.log(this);
 });
 
