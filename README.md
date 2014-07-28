@@ -46,7 +46,7 @@ flux
 
   (dispatch order is now storeB, storeA);
 
-  flux.dispatch('storeB waits for storeA);
+  flux.dispatch('storeB waits for storeA');
 
   //logs:
   // 'storeA', 'storeB waits for storeA'
