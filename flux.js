@@ -12,9 +12,22 @@ var flux = new Flux();
 var Store = flux.Store;
 
 var store = new Store();
+var store2 = new Store();
 
 store.register(function (action) {
-  console.log(action);
+  
+  this.waitFor(store2, _.bind(function (action) {
+    console.log('delayed', action);
+    console.log(this);
+  }, this));
+  console.log(this);
+});
+
+
+store2.register(function (action) {
+  this.waitFor(store, _.bind(function (action) {
+    console.log('waiting....done.');
+  }, this));
   console.log(this);
 });
 
