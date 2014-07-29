@@ -12,7 +12,7 @@
     otherFunc: function (x) {
       console.log('storeA, otherfunc', x);
       if (x == 42) {
-        flux.dispatch("24");
+        flux.dispatchForceNextTick("24");
         //flux.dispatch("24");
       }
     },
@@ -77,9 +77,9 @@
   });
 
 
-  flux.dispatchForceNextTick('hello, world');
-  flux.dispatchForceNextTick('42');
-  flux.dispatchForceNextTick({
+  flux.dispatch('hello, world');
+  flux.dispatch('42');
+  flux.dispatch({
     foo: "bar"
   });
   //logs:
