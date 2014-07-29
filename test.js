@@ -10,11 +10,13 @@
   var storeA = new Store({ 
     foo: "bar",
     otherFunc: function (x) {
+      this.waitFor(store3, function (x) {
       console.log('storeA, otherfunc', x);
       if (x == 42) {
         flux.dispatchForceNextTick("24");
-        //flux.dispatch("24");
+        flux.dispatch("24");
       }
+    });
     },
     someFunc: function (x) {
       console.log('storeA', x);
@@ -58,7 +60,12 @@
     console.log('store2', x);
   });
 
-
+  var store3 = new Store();
+  store3.register(function () {
+    this.waitFor(store1, function (x) {
+      console.log('store3', x);
+    });
+  });
 
   //logs:
   // 'store2 responded',
