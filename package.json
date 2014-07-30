@@ -2,12 +2,19 @@
   "name": "flux",
   "version": "0.0.0",
   "description": "",
-  "main": "index.js",
+  "author": "sterpe",
+  "license": "",
+  "main": "lib/flux.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/testling/bin/cmd.js"
   },
-  "author": "",
-  "license": "Copyright 2014, the Rubicon Project.",
+  "testling": {
+    "harness": "mocha-bdd",
+    "files": "spec/**/*.js",
+    "browsers": [
+      "firefox/latest"
+    ]
+  },
   "dependencies": {
     "lodash": "^2.4.1",
     "q": "^1.0.1",
@@ -18,6 +25,6 @@
     "ink-docstrap": "^0.4.12",
     "gulp": "^3.8.6",
     "mocha": "^1.21.3",
-    "should": "^4.0.4"
+    "testling": "^1.7.0"
   }
 }
