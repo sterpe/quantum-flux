@@ -1,3 +1,4 @@
 node_modules/
+spec/mocha-phantomjs/tests
 docs/
 .tmp/

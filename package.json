@@ -10,10 +10,8 @@
   },
   "testling": {
     "harness": "mocha-bdd",
-    "files": "spec/**/*.js",
-    "browsers": [
-      "firefox/latest"
-    ]
+    "files": "test/**/*.js",
+    "browsers": []
   },
   "dependencies": {
     "lodash": "^2.4.1",
@@ -25,6 +23,12 @@
     "ink-docstrap": "^0.4.12",
     "gulp": "^3.8.6",
     "mocha": "^1.21.3",
-    "testling": "^1.7.0"
+    "testling": "^1.7.0",
+    "should": "^4.0.4",
+    "chai": "^1.9.1",
+    "http-server": "^0.6.1",
+    "browserify": "^5.9.1",
+    "vinyl-source-stream": "^0.1.1",
+    "gulp-browserify": "^0.5.0"
   }
 }
