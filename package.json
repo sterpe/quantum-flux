@@ -6,7 +6,7 @@
   "license": "",
   "main": "lib/flux.js",
   "scripts": {
-    "test": "./node_modules/testling/bin/cmd.js"
+    "test": "gulp mocha"
   },
   "dependencies": {
     "lodash": "^2.4.1",
