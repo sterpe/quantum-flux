@@ -16,6 +16,8 @@
   "devDependencies": {
     "jsdoc": "^3.3.0-alpha9",
     "ink-docstrap": "^0.4.12",
-    "gulp": "^3.8.6"
+    "gulp": "^3.8.6",
+    "mocha": "^1.21.3",
+    "should": "^4.0.4"
   }
 }
