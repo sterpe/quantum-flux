@@ -2,7 +2,7 @@
   "name": "flux",
   "version": "0.0.0",
   "description": "",
-  "main": "flux.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "jsdoc": "^3.3.0-alpha9",
-    "ink-docstrap": "^0.4.12"
+    "ink-docstrap": "^0.4.12",
+    "gulp": "^3.8.6"
   }
 }
