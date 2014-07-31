@@ -102,7 +102,7 @@ var storeA = new flux.Store(),
     
   });
   
-```javascript
+```
 
 ####All emits that occured during a dispatch phase are handled, in registration order, synchronously.
 
