@@ -24,7 +24,7 @@ Any properties attached to the config object passed into the flux.Store construc
   
 ```javascript
   
-  var myStore = flux.Store({
+  var myStore = new flux.Store({
     foo: "bar",
     funcB: function () {/*...*/},
     funcA: function (payload) {
@@ -39,6 +39,7 @@ Any properties attached to the config object passed into the flux.Store construc
 Now register this store and a listener function to the flux dispatcher!
 ```javascript
 
+  var myStore = new flux.Store();
   //Note: the registered function will be called with `myStore` as the `this` value.
   
   myStore.register(function () {});
@@ -65,9 +66,8 @@ Now register this store and a listener function to the flux dispatcher!
     myStore.removeListener(l);
   });
   
-  // Basically works like node EventEmitter except that if listenerA removes listenerB and they were
-  // registered in that order originally then listenerB is immediately removed and not called for that event...
-  // consistent with in-browser removeEventListener, not node's removeListener.
+  // Basically works like node EventEmitter except that removal behavior is consistent with
+  //in-browser removeEventListener, not node's removeListener.
   
 ```
 
@@ -106,10 +106,10 @@ var storeA = new flux.Store(),
 
 ####All emits that occured during a dispatch phase are handled, in registration order, synchronously.
 
-In the example above, if both storeA & storeB emit events to their listeners, storeA's events will be handled,
+In the example above, if both storeA & storeB emit events to their listeners, storeA's eventListeners will be called,
 before storeB's, even though storeA waited on storeB.
 
-All emits are handled synchronously, in registration order, the browser will not re-render until all store event listeners have had a chance to execute, (despite the fact that the dispatcher itself is asynchronous).
+All emits are handled synchronously, in registration order, the browser will not re-render until all store event listeners have had a chance to execute.
 
 ####You can extend from the Store.prototype.
 
