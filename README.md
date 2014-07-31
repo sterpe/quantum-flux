@@ -40,16 +40,14 @@ Now register this store and a listener function to the flux dispatcher!
 ```javascript
 
   var myStore = new flux.Store();
-  //Note: the registered function will be called with `myStore` as the `this` value.
   
+  //Note: the registered function will be called with `myStore` as the `this` value.
   myStore.register(function () {});
   
   //Change the registered function, can be done even in response to a dispatch and takes effect on next dispatch!
-  
   myStore.register(myStore.funcA);
   
   //you can also unregister a store, the dispatcher will no longer send dispatches to this store.
-  
   myStore.unregister();
 ```
 
@@ -58,12 +56,12 @@ Now register this store and a listener function to the flux dispatcher!
 ```javascript
 
   //Stores share the EventEmitter* prototype so components can register to listen to their events.
-  
-  myStore.addListener(function l(e /*, ...args */) {
+  //This lets stores and listeners communicate a variety of events, besides just `change`.
+  myStore.addListener('change', function l(e /*, ...args */) {
     
     //do something in response to the event.
     
-    myStore.removeListener(l);
+    myStore.removeListener(l);  //You probably don't need to do this, but you can...
   });
   
   // Basically works like node EventEmitter except that removal behavior is consistent with
