@@ -111,7 +111,7 @@ before storeB's, even though storeA waited on storeB.
 
 All emits are handled synchronously, in registration order, the browser will not re-render until all store event listeners have had a chance to execute.
 
-####You can extend from the Store.prototype.
+####You can extend from the Store.prototype:
 
 ```javascript
 
