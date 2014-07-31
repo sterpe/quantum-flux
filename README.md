@@ -1,5 +1,9 @@
-flux
+quantum-flux
 ====
+
+A clean and understandable API that provides async, integrated, stores and
+dispatchers for Facebook's React Framework(tm).
+
 
 ````javascript
   var flux = new Flux(),

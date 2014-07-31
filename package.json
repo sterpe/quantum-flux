@@ -1,9 +1,17 @@
 {
-  "name": "flux",
-  "version": "0.0.0",
-  "description": "",
-  "author": "sterpe",
-  "license": "",
+  "name": "quantum-flux",
+  "version": "0.0.1",
+  "description": "Easy, async, integrated Flux/React dispatcher and stores.",
+  "keywords": [
+    "flux",
+    "react",
+    "dispatcher",
+    "stores",
+    "async",
+    "facebook"
+  ],
+  "author": "sterpe <srterpe@gmail.com>",
+  "license": "MIT",
   "main": "lib/flux.js",
   "scripts": {
     "test": "gulp mocha"
@@ -21,6 +29,16 @@
     "should": "^4.0.4",
     "chai": "^1.9.1",
     "http-server": "^0.6.1",
-    "browserify": "^5.9.1"
-  }
+    "browserify": "^5.9.1",
+    "phantomjs": "^1.9.7-15",
+    "mocha-phantomjs": "^3.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sterpe/quantum-flux.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sterpe/quantum-flux/issues"
+  },
+  "homepage": "https://github.com/sterpe/quantum-flux"
 }
