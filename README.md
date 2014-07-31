@@ -119,7 +119,7 @@ function myCustomComplicatedStore {
 
 }
 
-extendFunc(myCustomComplicatedStore, flux.Store);
+extendFunc(myCustomComplicatedStore.prototype, flux.Store.prototype);
 
 //Wha-la.
 ```
