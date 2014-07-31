@@ -4,84 +4,125 @@ quantum-flux
 A clean and understandable API that provides async, integrated, stores and
 dispatchers for Facebook's React Framework(tm).
 
+####Create a new flux instance for your application:
 
-````javascript
-  var flux = new Flux(),
-    _ = require('lodash');
+```javascript
 
-  var Store = flux.Store;
+  var quantum = require('quantum-flux');
+  
+  var flux = new quantum.FluxInstance();
+  
+  //dispatch a payload, it can be anything, though you'll probably prefer to use objects.
 
-  var storeA = new Store({ 
+  flux.dispatch('hello, quantum flux!');
+
+```
+
+####Create a new store:
+
+Any properties attached to the config object passed into the flux.Store constructor are attached to `this` store.
+  
+```javascript
+  
+  var myStore = flux.Store({
     foo: "bar",
-    someFunc: function (x) {
-      console.log('storeA', x);
+    funcB: function () {/*...*/},
+    funcA: function (payload) {
+      //do something with the payload!
+      
+      this.emit('change', /*args to pass to this event*/);
     }
   });
+```
+####Registering and unregistering a store:
 
-  storeA.register(storeA.someFunc);
+Now register this store and a listener function to the flux dispatcher!
+```javascript
 
-  //Later...
-  flux.dispatch('hello, world');
-
-  //logs: 'storeA', 'hello, world'
-
-  //change the registered function 
-  storeA.register(function () {});
-
-  //unregister a store if you want to take it out of service.
-  storeA.unregister();
-
-  //Or extend a custom constructor from the Store.prototype...
-
-  var Store1Factory = function () {
-    //very complex store initialization code here...
-  };
+  //Note: the registered function will be called with `myStore` as the `this` value.
   
-  _.extend(Store1Factory.prototype, Store.prototype);
+  myStore.register(function () {});
   
-  var store1 = new Store1Factory();
-
-  var store2 = new Store();
- 
-  //Register an anonymous function (will be called with store as `this`);
-  store1.register(function () {
-    var promise = this.waitFor(store2, function (x) {
-      console.log('store1', x);
-    }, function (e) {
-      console.log(e);
-    });
-  });
-
-  store2.register(function () {
-    console.log('store2 responded');
-  });
-
-
-  flux.dispatch('42');
-
-  //logs:
-  // 'store2 responded',
-  // 'store1', '42'
-
-
-  //Stores extend EventEmitter.prototype
-
-  var storeC = new Store().register(function (payload) {
-    this.emit('change', payload.foo);
-  });
-
-  storeC.addListener('change', function (foo) {
-    console.log('foo was ' + foo);
-  });
-
-  flux.dispatch({
-    foo: "bar"
-  });
-
-  //logs:
-  // 'foo was bar'
-
+  //Change the registered function, can be done even in response to a dispatch and takes effect on next dispatch!
   
+  myStore.register(myStore.funcA);
   
+  //you can also unregister a store, the dispatcher will no longer send dispatches to this store.
   
-````
+  myStore.unregister();
+```
+
+####Stores are EventEmitters:
+
+```javascript
+
+  //Stores share the EventEmitter* prototype so components can register to listen to their events.
+  
+  myStore.addListener(function l(e /*, ...args */) {
+    
+    //do something in response to the event.
+    
+    myStore.removeListener(l);
+  });
+  
+  // Basically works like node EventEmitter except that if listenerA removes listenerB and they were
+  // registered in that order originally then listenerB is immediately removed and not called for that event...
+  // consistent with in-browser removeEventListener, not node's removeListener.
+  
+```
+
+####Waiting for other Stores:
+
+Stores can wait for another store or stores.
+
+```javascript
+
+var storeA = new flux.Store(),
+  storeB = new flux.Store();
+  
+  storeA.register(function (payload) {
+    
+    switch (payload.someCondition) {
+    
+      case foo:
+        this.waitFor(storeB /* or an [ ] of stores! */, function onFulfilled (payload) {
+        
+          //do something now that storeB is done
+        
+          this.emit('change');
+        }, function onError (e) {
+        
+          //do whatever in case there was an error in storeB
+        });
+        break;
+        
+      default:
+        return;
+    }
+    
+  });
+  
+```javascript
+
+####All emits that occured during a dispatch phase are handled, in registration order, synchronously.
+
+In the example above, if both storeA & storeB emit events to their listeners, storeA's events will be handled,
+before storeB's, even though storeA waited on storeB.
+
+All emits are handled synchronously, in registration order, the browser will not re-render until all store event listeners have had a chance to execute, (despite the fact that the dispatcher itself is asynchronous).
+
+####You can extend from the Store.prototype.
+
+```javascript
+
+function myCustomComplicatedStore {
+
+//Yadda, yadda, yadda...
+
+}
+
+extendFunc(myCustomComplicatedStore, flux.Store);
+
+//Wha-la.
+```
+
