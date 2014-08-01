@@ -30,13 +30,20 @@ dispatchers for Facebook's React Framework(tm).
 Any properties attached to the config object passed into the flux.Store constructor are attached to `this` store.
   
 ```javascript
+  //If you just need a quick store...
+  var aStore = new flux.Store();
   
+  //Probably you'll eventually need to do something more complex,
+  //the flux.Store constructor will extend the store with any properties passed it via a `conf` object.
+  
+  //We define the property `foo`, `funcB`, and `funcA` for `myStore` instance.
   var myStore = new flux.Store({
     foo: "bar",
     funcB: function () {/*...*/},
     funcA: function (payload) {
       //do something with the payload!
       
+      //Store objects share the EventEmitter prototype -- they can emit events and attach listeners!
       this.emit('change', /*args to pass to this event*/);
     }
   });
@@ -49,9 +56,11 @@ Now register this store and a listener function to the flux dispatcher!
   var myStore = new flux.Store();
   
   //Note: the registered function will be called with `myStore` as the `this` value.
-  myStore.register(function () {});
+  myStore.register(function (payload) {
+    this.emit('change');
+  });
   
-  //Change the registered function, can be done even in response to a dispatch and takes effect on next dispatch!
+  //You can change or swap the registered function at any time and it takes effect immediately!
   myStore.register(myStore.funcA);
   
   //you can also unregister a store, the dispatcher will no longer send dispatches to this store.
@@ -62,17 +71,14 @@ Now register this store and a listener function to the flux dispatcher!
 
 ```javascript
 
-  //Stores share the EventEmitter* prototype so components can register to listen to their events.
-  //This lets stores and listeners communicate a variety of events, besides just `change`.
-  myStore.addListener('change', function l(e /*, ...args */) {
+  myStore.addListener('change', function listener(e /*, ...args */) {
     
-    //do something in response to the event.
+    //have your View-controller do something in response to the event.
     
-    myStore.removeListener(l);  //You probably don't need to do this, but you can...
+    myStore.removeListener(listener);  //You probably don't need to do this, but you can...
+    
   });
   
-  // Basically works like node EventEmitter except that removal behavior is consistent with
-  //in-browser removeEventListener, not node's removeListener.
   
 ```
 
@@ -111,12 +117,18 @@ var storeA = new flux.Store(),
 
 ####All emits that occured during a dispatch phase are handled, in registration order, synchronously.
 
+When a store calls `this.emit(e, [args])`, that call is tied into to the dispatch phase/cycle...sort of like the way
+machine guns on WWI aircraft were linked to the engine cycle, to avoid shooting off the propellor.  This is also similar to the way that AngularJS's $setTimeout function is tied into the Angular digest cycle, for those familiar with Angular.
+
+`emit` calls are queued and fired in order synchronously, so we never have to worry about a browser redraw occuring between the point where all the stores have completed processing the dispatch and all listeners of those stores have executed their callbacks.
+
+There shouldn't be dependency on side effects between listeners of separate stores for the same event.  If two stores take action in response to the same dispatch, the listeners for each store are fired in store registration order.  This provides for reasonable consistency of callback order.
+
 In the example above, if both storeA & storeB emit events to their listeners, storeA's eventListeners will be called,
 before storeB's, even though storeA waited on storeB.
 
-All emits are handled synchronously, in registration order, the browser will not re-render until all store event listeners have had a chance to execute.
 
-####You can extend from the Store.prototype:
+####Finally, if you really want to get crazy, you can extend from the Store.prototype:
 
 ```javascript
 
@@ -126,7 +138,7 @@ function myCustomComplicatedStore {
 
 }
 
-extendFunc(myCustomComplicatedStore.prototype, flux.Store.prototype);
+favoriteExtendFunc(myCustomComplicatedStore.prototype, flux.Store.prototype);
 
 //Wha-la.
 ```
