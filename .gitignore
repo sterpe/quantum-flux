@@ -1,4 +1,6 @@
 node_modules/
+.module-cache/
 spec/mocha-phantomjs/tests
 docs/
+jsx2js/
 .tmp/

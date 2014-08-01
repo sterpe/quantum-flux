@@ -1,0 +1,17 @@
+{
+  "name": "q-flux-router",
+  "version": "0.0.0",
+  "description": "An example router using q-flux dispatcher/stores.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "postinstall": "jsx -x jsx lib/jsx lib/jsx2js;node_modules/browserify/bin/cmd.js lib/q-flux-demo.js -o q-flux-bundle.js "
+  },
+  "author": "sterpe <srterpe@gmail.com> (https://github.com/sterpe)",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^0.11.1",
+    "browserify": "^5.9.1",
+    "lodash": "^2.4.1"
+  }
+}
