@@ -122,11 +122,55 @@ machine guns on WWI aircraft were linked to the engine cycle, to avoid shooting 
 
 `emit` calls are queued and fired in order synchronously, so we never have to worry about a browser redraw occuring between the point where all the stores have completed processing the dispatch and all listeners of those stores have executed their callbacks.
 
-There shouldn't be dependency on side effects between listeners of separate stores for the same event.  If two stores take action in response to the same dispatch, the listeners for each store are fired in store registration order.  This provides for reasonable consistency of callback order.
+This is difficult to explain in words but consider this sample output--
+  (stores are A,B,C,D,E --registered with the dispatcher in that order, and each store has 1 listener):
 
-In the example above, if both storeA & storeB emit events to their listeners, storeA's eventListeners will be called,
-before storeB's, even though storeA waited on storeB.
+```
+**CREATED NEW STORE** :: 97f68250-18f0-11e4-b902-bd789b968062
+**CREATED NEW STORE** :: 97f83000-18f0-11e4-b902-bd789b968062
+**CREATED NEW STORE** :: 97f83001-18f0-11e4-b902-bd789b968062
+**CREATED NEW STORE** :: 97f83002-18f0-11e4-b902-bd789b968062
+**CREATED NEW STORE** :: 97f83003-18f0-11e4-b902-bd789b968062
+**CREATED NEW STORE** :: 97f83004-18f0-11e4-b902-bd789b968062
 
+
+Dispatching payload: 1
+Dispatching payload: 2
+Dispatching payload: 3
+Dispatching payload: 4
+Dispatching payload: 5
+
+
+
+ NEXT DISPATCH PHASE BEGINS -- PAYLOAD IS: 1
+
+
+ The payload was "1" so D dispatched the payload "9"
+
+ B waited for D
+
+ The payload was '1' so B dispatched the payload '7'
+
+ A waited for B
+
+ The payload was "1" so B dispatched payload "8"
+
+ E waited for D,B,C
+
+Listener of A reporting. Payload was: 1
+Listener of B reporting. Payload was: 1
+Listener of C reporting. Payload was: 1
+Listener of D reporting. Payload was: 1
+Listener of E reporting. Payload was: 1
+```
+
+There shouldn't be dependency on side effects between listeners of separate stores for the same event.
+
+We see in the sample flow above that regardless of who waited on who, all stores have completed their updates by the time any 
+listeners have received the corresponding change events.  Also the listeners of each particular store are fired in store-dispatch registration order.
+
+The important point here is that you should avoid creating implicit dependencies between listeners of separate stores for the
+same event.  I.e., the `Listener of A` above, shouldn't have a dependency on any action performed by `Listener of B` and vice versa.  If you do have a need for those dependencies, consider handling them by dispatching the appropriate events through the dispatcher.
 
 ####Finally, if you really want to get crazy, you can extend from the Store.prototype:
 
