@@ -1,6 +1,6 @@
 {
   "name": "quantum-flux",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Easy, async, integrated Flux/React dispatcher and stores.",
   "keywords": [
     "flux",
