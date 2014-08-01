@@ -1,6 +1,6 @@
 {
   "name": "quantum-flux",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "Easy, async, integrated Flux/React dispatcher and stores.",
   "keywords": [
     "flux",
@@ -40,5 +40,5 @@
   "bugs": {
     "url": "https://github.com/sterpe/quantum-flux/issues"
   },
-  "homepage": "https://github.com/sterpe/quantum-flux"
+  "homepage": "http://sterpe.github.io/quantum-flux"
 }
