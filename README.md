@@ -9,6 +9,8 @@ dispatchers for Facebook's React Framework(tm).
   npm install quantum-flux
 ```
 
+[Full API Documentation is here](http://sterpe.github.io/quantum-flux/out/Store.html)  It's a work in progress so please excuse the mess, but you will find full documentation for the `quantum.FluxInstance` and `FluxInstance.Store` classes. 
+
 ####Create a new flux instance for your application:
 
 ```javascript
