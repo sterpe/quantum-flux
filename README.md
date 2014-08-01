@@ -4,6 +4,11 @@ quantum-flux
 A clean and understandable API that provides async, integrated, stores and
 dispatchers for Facebook's React Framework(tm).
 
+####Install:
+```
+  npm install quantum-flux
+```
+
 ####Create a new flux instance for your application:
 
 ```javascript
