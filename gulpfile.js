@@ -14,16 +14,21 @@ gulp.task('mocha-clean', [], function (cb) {
     if (!exists) {
       fs.mkdir('spec/mocha-phantomjs/tests', function (error) {
         return error ? cb(error) :
-            fs.unlink('spec/mocha-phantomjs/tests/mocha-bundle.js',
-              function (error) {
-                cb(error);
-              });
+            (fs.exists('spec/mocha-phantomjs/tests/mocha-bundle.js') &&
+                fs.unlink('spec/mocha-phantomjs/tests/mocha-bundle.js',
+                function (error) {
+                  cb(error);
+                }));
       });
     } else {
-      fs.unlink('spec/mocha-phantomjs/tests/mocha-bundle.js',
-        function (error) {
-          cb(error);
-        });
+      if (fs.exists('spec/mocha-phantomjs/tests/mocha-bundle.js')) {
+        fs.unlink('spec/mocha-phantomjs/tests/mocha-bundle.js',
+          function (error) {
+            cb(error);
+          });
+      } else {
+        cb();
+      }
     }
   });
 });

@@ -1,0 +1,8 @@
+{
+  "PROCESS_STATUS": {
+    "BUSY": 1,
+    "HALT":2,
+    "WAIT": 3,
+    "IDLE": 0
+  }
+}
