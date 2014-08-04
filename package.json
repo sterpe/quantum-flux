@@ -14,7 +14,7 @@
   "license": "MIT",
   "main": "lib/flux.js",
   "scripts": {
-    "test": "gulp mocha"
+    "test": "tape test/*.js"
   },
   "dependencies": {
     "lodash": "^2.4.1",
@@ -31,7 +31,22 @@
     "http-server": "^0.6.1",
     "browserify": "^5.9.1",
     "phantomjs": "^1.9.7-15",
-    "mocha-phantomjs": "^3.5.0"
+    "mocha-phantomjs": "^3.5.0",
+    "tape": "^2.13.4",
+    "testling": "^1.7.0"
+  },
+  "testling": {
+    "files": "test/*.js",
+    "browsers": [
+      "ie/6..latest",
+      "chrome/22..latest",
+      "firefox/16..latest",
+      "safari/latest",
+      "opera/11.0..latest",
+      "iphone/6",
+      "ipad/6",
+      "android-browser/latest"
+    ]
   },
   "repository": {
     "type": "git",
