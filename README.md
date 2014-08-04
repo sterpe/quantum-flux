@@ -1,6 +1,8 @@
 quantum-flux
 ====
 
+[![Build Status](https://travis-ci.org/sterpe/quantum-flux.svg?branch=master)](https://travis-ci.org/sterpe/quantum-flux)
+
 A clean and understandable API that provides async, integrated, stores and
 dispatchers for Facebook's React Framework(tm).
 
