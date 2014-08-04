@@ -1,4 +1,5 @@
-quantum-flux
+![quantum-flux](http://sterpe.github.io/quantum-flux/img/quantum-flux.jpg "")
+
 ====
 
 [![Build Status](https://travis-ci.org/sterpe/quantum-flux.svg?branch=master)](https://travis-ci.org/sterpe/quantum-flux)
