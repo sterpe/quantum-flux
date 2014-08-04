@@ -2,6 +2,9 @@
  * 
  * max.js */
 
+
+
+
 var maxBy = require('../index.js');
 var test = require('tape');
 
