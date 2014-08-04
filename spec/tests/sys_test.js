@@ -15,7 +15,7 @@ describe('Sys', function () {
     });
     describe('(global) window#postMessage()', function () {
       it('should be a function for this to work', function () {
-        window.postMessage.should.be.a.Function;
+        window.postMessage.should.not.be.a.Function;
       });
     });
   });
