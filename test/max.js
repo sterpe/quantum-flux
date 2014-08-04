@@ -7,7 +7,7 @@
 
 var maxBy = require('../index.js');
 var test = require('tape');
-
+"foo";
 test('simple comparison', function (t) {
   "use strict";
   t.plan(1);
