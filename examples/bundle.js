@@ -33,26 +33,16 @@ function Dispatcher() {
 
     this.onStoreWaitFor = _.bind(this.onStoreWaitFor, this);
 
+    this.drainEmitQueue = _.bind(this.drainEmitQueue, this);
+
     this.onStoreEmit = _.bind(this.onStoreEmit, this);
-    this.addEventListener('processEnd', _.bind(function () {
+
+    this.addEventListener('processEnd', function () {
       console.log('processEnd');
-      var self,
-        stack = [];
+    });
 
+    this.addEventListener('processEnd', this.drainEmitQueue);
 
-      self = this.__dispatcher;
-
-      while (self.emitQueue.length) {
-        stack.push(self.emitQueue.pop());
-      }
-      while (stack.length) {
-        stack.pop().call();
-        while (self.emitQueue.length) {
-          stack.push(self.emitQueue.pop());
-        }
-      }
-    }, this));
-  
     this.addEventListener('taskEnd', function () {
       console.log('taskEnd');
     });
@@ -60,42 +50,16 @@ function Dispatcher() {
     this.addEventListener('processStart', function () {
       console.log('processStart');
     });
-    this.addEventListener('taskStart', _.bind(function () {
-      var self,
-        stack = [];
-
+    this.addEventListener('taskStart', function () {
       console.log('taskStart');
+    });
+    this.addEventListener('taskStart', this.drainEmitQueue);
 
-      self = this.__dispatcher;
+    this.addEventListener('taskClear', function () {
+      console.log('taskClear');
+    });
 
-      while (self.emitQueue.length) {
-        stack.push(self.emitQueue.pop());
-      }
-      while (stack.length) {
-        stack.pop().call();
-        while (self.emitQueue.length) {
-          stack.push(self.emitQueue.pop());
-        }
-      }
-    }, this));
-
-    this.addEventListener('taskClear', _.bind(function () {
-      var self,
-        stack = [];
-
-
-      self = this.__dispatcher;
-
-      while (self.emitQueue.length) {
-        stack.push(self.emitQueue.pop());
-      }
-      while (stack.length) {
-        stack.pop().call();
-        while (self.emitQueue.length) {
-          stack.push(self.emitQueue.pop());
-        }
-      }
-    }, this));
+    this.addEventListener('taskClear', this.drainEmitQueue);
 
     this.addEventListener('processHalt', function () {
       console.log('processHalt');
@@ -105,6 +69,7 @@ function Dispatcher() {
     });
 
     return {
+      snapshots: [],
       emitQueue: [],
       storesData: {}
     };
@@ -120,13 +85,48 @@ _.extend(
 
 _.extend(Dispatcher.prototype, {
 
+  drainEmitQueue: function () {
+    "use strict";
+    var self,
+      stack = [];
+
+
+    self = this.__dispatcher;
+
+    this.snapshot();
+    while (self.emitQueue.length) {
+      stack.push(self.emitQueue.pop());
+    }
+    while (stack.length) {
+      stack.pop().call();
+      while (self.emitQueue.length) {
+        stack.push(self.emitQueue.pop());
+      }
+    }
+  },
+
+  snapshot: function () {
+    "use strict";
+    var self;
+
+    self = this.__dispatcher;
+
+    self.snapshots.push(JSON.stringify(_.map(self.storesData,
+      function (data, key) {
+        var obj = {};
+        obj[key] = data.store;
+        return obj;
+      })));
+  },
   register: function (store, listener) {
     "use strict";
-
-    var self = this.__dispatcher;
+    var self;
 
     Dispatcher.prototype.constructor.call(this);
     Store.prototype.constructor.call(store);
+
+    self = this.__dispatcher;
+
 
     if (self.storesData[store.guid()] !== undefined) {
       this.unregister(store);
@@ -261,8 +261,8 @@ _.extend(Dispatcher.prototype, {
       });
 
       this.emit('#channel', payload);
-
     }, this));
+
   },
 
   thread: function () {
@@ -291,11 +291,12 @@ _.extend(Dispatcher.prototype, {
     var self;
 
     Dispatcher.prototype.constructor.call(this);
+    //this.unshift(fn);
     this.unshift(_.bind(function() {
       //this.interlace();
-      //this.thread();
+      this.thread();
       this.enqueue(fn);
-      //this.dethread();
+      this.dethread();
     },this));
   }
 
@@ -761,16 +762,27 @@ function _process() {
 
   this.emit('processStart');
 
+  while (self.immediate_q.length) {
+    self.stage_q.unshift(self.immediate_q.pop());
+  }
   while (self.work_q.length) {
     self.stage_q.push(self.work_q.pop());
   }
   while (self.stage_q.length) {
 
-
+    while (self.immediate_q.length) {
+      self.stage_q.unshift(self.immediate_q.pop());
+    }
     while (self.stage_q.length) {
       self.work_q.push(self.stage_q.pop());
     }
+
     this.emit('taskStart');
+
+    while (self.immediate_q.length) {
+      self.stage_q.unshift(self.immediate_q.pop());
+    }
+
     while (self.stage_q.length) {
       self.work_q.push(self.stage_q.pop());
     }
@@ -792,6 +804,10 @@ function _process() {
 
     if (!self.stage_q.length) {
       this.emit('taskClear');
+
+      while (self.immediate_q.length) {
+        self.stage_q.unshift(self.immediate_q.pop());
+      }
     }
   }
 
@@ -806,6 +822,7 @@ function TaskProcessQueue() {
   this.__taskProcessQueue = this.__taskProcessQueue || {
     stage_q: [],
     work_q: [],
+    immediate_q: [],
     status: PROCESS_STATUS.IDLE,
     interlace: false,
     process: _.bind(_process, this)
@@ -825,7 +842,7 @@ _.extend(TaskProcessQueue.prototype, {
 
     self = this.__taskProcessQueue;
 
-    self.stage_q.unshift(task);
+    self.immediate_q.push(task);
 
     if (self.status === PROCESS_STATUS.IDLE) {
       self.status = PROCESS_STATUS.BUSY;
