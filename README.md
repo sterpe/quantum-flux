@@ -4,16 +4,257 @@
 
 [![Build Status](https://travis-ci.org/sterpe/quantum-flux.svg?branch=master)](https://travis-ci.org/sterpe/quantum-flux)
 
-A clean and understandable API that provides async, integrated, stores and
-dispatchers for Facebook's React Framework(tm).
 
-####Install:
+###Installation:
 ```
   npm install quantum-flux
 ```
 
-[Full API Documentation is here](http://sterpe.github.io/quantum-flux/out/Store.html)  It's a work in progress so please excuse the mess, but you will find full documentation for the `quantum.FluxInstance` and `FluxInstance.Store` classes. 
+###Basic Usage:
 
+```javascript
+  //Create a flux dispatcher. ********************************************
+  
+  var Quantum = require('quantum-flux');
+  
+  var flux = new Quantum();
+
+  //Register a store. ****************************************************
+
+  var store = {
+    data: null
+  };
+  
+  flux.register(store, function (payload) {
+    //Do something when there is an appropriate payload
+    switch (payload.isRelevant) {
+
+    case "yes": 
+      //update the store's data.
+      this.data = payload.data;
+      break;
+
+    default:
+      return;
+    }
+    //notify any listeners that there was a change.
+    this.changed();
+  });
+
+  //Add a listener to this store. ****************************************
+
+  store.onChange(function () {
+    //do something with the store data when it's updated.
+    console.log(store.data);
+  });
+
+  //Dispatch an action! **************************************************
+
+  flux.dispatch({
+    isRelevant: "yes",
+    data: 42
+  });
+
+```
+##API Documentation
+
+###Quantum()
+--
+####Constructor
+#####Parameters:
+######none
+```javascript
+  var Quantum = require('quantum-flux');
+
+  var flux = new Quantum();
+
+```
+###Quantum._dispatch(payload)_
+--
+#####Description:
+Dispatch the argument `payload` to all registered stores.
+#####Parameters
+Name | Type | Description
+--- | --- | --- |
+`payload` |`any` | The thing to be dispatched, can be falsey.
+
+#####Returns
+`undefined`
+
+#####Example
+```javascript
+  var flux = new Quantum(),
+
+  flux.dispatch({
+    actionType: 'first quantum dispatch!',
+    value: 'hello, quantum-flux!'
+  });
+
+```
+  
+###Quantum._register(store, listener)_
+--
+#####Description:
+Register a new store and it's listener with the dispatcher. 
+If `store` is already registered with the dispatcher, changes stores current listening function to `listener`.
+#####Parameters
+Name | Type | Description
+--- | --- | --- |
+`store` |`{object}` | ``
+`listener` |`{function}` | The store's callback for dispatches; will be called as: `listener.apply(store, [args]);`
+
+#####Returns
+`store`
+
+#####Example
+
+```javascript
+  var flux = new Quantum();
+
+  var store = {
+    foo: "bar",
+    fn: function (payload) {
+      if (payload.actionType === "FOO_UPDATE") {
+        this.foo = payload.value;
+        this.changed();
+      }
+    }
+  };
+  
+  flux.register(store, store.fn);
+```
+###Quantum._unregister(store)_
+--
+#####Description
+Unregister `store` with the dispatcher. The listening function associated with `store` will no longer be informed about dispatch events.
+#####Parameters
+Name | Type | Description
+--- | --- | --- |
+`store` | `{object}` | The store to be unregistered with the flux dispatcher.
+#####Returns
+`store`
+
+#####Example
+
+```javascript
+  //Assume `store` is a previously registered store.
+  
+  flux.unregister(store);
+```
+###Store._addChangeListener(func)_
+###Store._removeChangeListener(func)_
+###Store._changed([args])_
+###Store._waitFor([stores], onFulfilled, onRejected)_
+###Store._emit(e, [args])_
+###Store._on(e, listener)_
+--
+#####Description
+Register a `listener` for event `e`.
+
+#####Parameters
+Name | Type | Description
+--- | --- | --- |
+`e` | {string} | The event to register against.
+`listener` | {function} | The listener to be called when the event is emitted.
+#####Aliases
+###### addEventListener(), addListener()
+
+
+
+###Store._off(e, func)_ 
+
+http://nodejs.org/api/events.html
+
+##Advanced (Experimental) APIs
+
+###Quantum._setImmediate(func)_
+--
+#####Description
+Preempt the next dispatch in the dispatch queue with the async evaluation of `func`.  A browser repaint will be allowed both before and after `func` is evaluated, then dispatching will continue in it's "natural"* order.  If `func` dispatches an action with Quantum.dispatch(), that dispatch will also precede the natural queue order...and so on.
+
+It can be hard to notice the effects of __setImmediate__ unless `func` issues a call to `Quantum#dispatch()` in all cases, however,  __setImmediate__ has the effect of "padding" the execution of `func` with browser repaints, i.e., it is asynchronous both before _and_ after.
+
+#####Parameters
+Name | Type | Description
+--- | --- | --- |
+`func`| `{function}` | The function to execute prior to the next dispatch in the "natural"* order.
+
+\* We can define "natural" order as the order of dispatch events queued such that registered stores fire their own changed listeners and other events in attached order __and__ stores do this in in the order of dispatch resolution...i.e., if storeA waitedFor storeB, storeB fires it's own changes prior to storeA.
+
+It's important to remember that the `quantum-flux` dispatcher supports recursive calls to dispatch as part of the natural order.
+
+#####Example
+```javascript
+  var flux = new Quantum();
+
+  var store1 = flux.register({}, function (p) {
+    this.changed();
+  });
+
+  store1.addChangeListener(function () {
+    console.log('logged synchronously');
+  });
+
+  var store2 = flux.register({}, function (p) {
+    this.changed();
+  });
+
+  store2.addChangeListener(function (p) {
+    flux.setImmediate(function () {
+      //The thread 'sleeps' directly before this...browser can repaint.
+      
+      console.log('executed asynchronously, but still in order');
+      
+      //And 'sleeps' directly after this again...browser can repaint.
+    });
+  });
+
+  flux.dispatch();
+
+  //logged synchronously
+  //executed asynchronously, but still in order
+```
+###Quantum._interlace()_
+--
+#####Description
+Use maximum thread-sharing when processing flux-store dispatch digestion.  This will increase the number of browser repaints available and/or allow other javascript processes (such as timers) to run while stores digest the current dispatch.
+
+If interlacing is already enabled, the call has no effect.
+
+By default, the __quantum-flux__ dispatcher only thread-shares when processing a __waitFor()__ or __setImmediate()__ request.
+
+#####Default
+######thead-interlacing is disabled.
+#####Parameters
+######none
+#####Returns
+`undefined`
+#####Example
+```javascript
+  var flux = new Quantum();
+
+  flux.interlace();
+  
+```
+
+###Quantum._deInterlace()_
+--
+#####Description
+Turn off thread-interlacing if it has been enabled, otherwise has no effect. Interlacing is __disabled__ by default.
+#####Default
+######thread-interlacing is disabled.
+#####Parameters
+######none
+#####Returns
+`undefined`
+#####Example
+```javascript
+  var flux = new Quantum();
+
+  flux.interlace();
+  flux.deInterlace();
+  
+```
 ####Create a new flux instance for your application:
 
 ```javascript
