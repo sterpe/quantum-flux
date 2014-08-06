@@ -10,6 +10,26 @@
   npm install quantum-flux
 ```
 
+###Table of Contents:
+  + [Basic Usage](./#basic-usage)
+  + [API Documentation](./#api-documentation)
+    + [Dispatcher] (./#the-dispatcher)
+      + [Quantum.constructor()] (./#quantum)
+      + [Quantum.dispatch(payload)] (./#quantumdispatch)
+      + [Quantum.register(store, listener)] (./#quantumregister)
+      + [Quantum.unregister(store)](./#quantumunregister)
+    + [Stores] (./#the-stores)
+      + [About Stores] (./#about-stores)
+      + [Store.waitFor([stores], onFulfilled, onRejected)] (./#storewaitfor)
+      + [Store.addChangeListener(func)] (./#storeaddchangelistener)
+      + [Store.removeChangeListener(func)] (./#storeremovechangelistener)
+      + [Store.changed([args])] (./#storechanged)
+    + [Advanced APIs] (./#advanced-apis)
+      + [Quantum.setImmediate(func)] (./#quantumsetimmediate)
+      + [Quantum.interlace()] (./#quantuminterlace)
+      + [Quantum.deInterlace()] (./#quantumdeinterlace)
+  + [Contributing to Quantum Flux] (./#contributing-to-quantum-flux)
+
 ###Basic Usage:
 
 ```javascript
@@ -56,20 +76,28 @@
   });
 
 ```
-##API Documentation
+#API Documentation
+--
+##the dispatcher
+###Quantum
+`Quantum()`
 
-###Quantum()
 --
 ####Constructor
-#####Parameters:
+#####Parameters
 ######none
+#####Example
 ```javascript
   var Quantum = require('quantum-flux');
 
   var flux = new Quantum();
 
 ```
-###Quantum._dispatch(payload)_
+
+--
+###Quantum.dispatch
+`Quantum.dispatch(payload)`
+
 --
 #####Description:
 Dispatch the argument `payload` to all registered stores.
@@ -91,8 +119,10 @@ Name | Type | Description
   });
 
 ```
-  
-###Quantum._register(store, listener)_
+--  
+###Quantum.register
+`Quantum.register(store, listener)`
+
 --
 #####Description:
 Register a new store and it's listener with the dispatcher. 
@@ -100,7 +130,7 @@ If `store` is already registered with the dispatcher, changes stores current lis
 #####Parameters
 Name | Type | Description
 --- | --- | --- |
-`store` |`{object}` | ``
+`store` |`{object}` | The dispatcher will automatically extend "plain" `Objects` with `Quantum.Store.prototype`.
 `listener` |`{function}` | The store's callback for dispatches; will be called as: `listener.apply(store, [args]);`
 
 #####Returns
@@ -123,7 +153,10 @@ Name | Type | Description
   
   flux.register(store, store.fn);
 ```
-###Quantum._unregister(store)_
+--
+###Quantum.unregister
+`Quantum.unregister(store)`
+
 --
 #####Description
 Unregister `store` with the dispatcher. The listening function associated with `store` will no longer be informed about dispatch events.
@@ -141,33 +174,159 @@ Name | Type | Description
   
   flux.unregister(store);
 ```
-###Store._addChangeListener(func)_
-###Store._removeChangeListener(func)_
-###Store._changed([args])_
-###Store._waitFor([stores], onFulfilled, onRejected)_
-###Store._emit(e, [args])_
-###Store._on(e, listener)_
+--
+##the stores
+####About Stores
+Stores implement an EventEmitter prototype very similiar to the [Node.js EventEmitter](http://nodejs.org/api/events.html) prototype with one exception:  the behavior of removeListener is consistent with the browser behavior of removeEventListener not Node's removeListener behavior.
+
+Please consult the Node.js documentation for complete API documentation for the EventEmitter prototype:
+
+http://nodejs.org/api/events.html
+####Example
+
+```javascript
+var flux = new Quantum;
+
+var store = {};
+
+flux.register(store, function () {});
+
+var f1 = function () {
+  store.removeListener('change', f2); // or aliases - #removeEventListener() or #off()
+};
+
+var f2 = function () {
+};
+
+store.addListener('change', f1); //or aliases - #addEventListener() or #on()
+store.addListener('change', f2);
+
+store.emit('change');
+
+//f2 was not called, as f1 removed it.  This is consistent with the
+//in browser behavior of `removeEventListener`.
+ 
+//In node.js f2 would have been called, but would not be called the
+//next time the `change` event was fired.
+```
+
+###Store.waitFor
+`Store.waitFor([stores], onFulfilled, onRejected)`
+
 --
 #####Description
-Register a `listener` for event `e`.
+When called inside a stores registered dispatch handler, instructs the
+dispatcher to defer execution of the onFulfilled or onRejected callbacks until the store or array of stores specified by `[stores]` have first completedthe current dispatch cycle.
 
+--
+###Store.addChangeListener
+`Store.addChangeListener(func)`
+
+--
+#####Description
+A convenience method for:
+
+```javascript
+Store.on('change', func);
+```
 #####Parameters
 Name | Type | Description
 --- | --- | --- |
-`e` | {string} | The event to register against.
-`listener` | {function} | The listener to be called when the event is emitted.
+`func` | `{function}`| The function handler for store change events.
+#####returns
+`undefined`
 #####Aliases
-###### addEventListener(), addListener()
+######onChange()
+#####Example
 
+```javascript
+var flux = new Quantum();
 
+var store = {};
 
-###Store._off(e, func)_ 
+flux.register(store, function () {});
 
-http://nodejs.org/api/events.html
+var f = function () { /*...*/ };
 
-##Advanced (Experimental) APIs
+store.addChangeListener(f);
 
-###Quantum._setImmediate(func)_
+```
+--
+###Store.removeChangeListener
+`Store.removeChangeListener(func)`
+
+--
+#####Description
+A convenience method for:
+
+```javascript
+Store.off('change', func);
+```
+#####Parameters
+Name | Type | Description
+---| --- | --- |
+`func` | `{function}` | The handler to desubscribe from change events.
+#####returns
+`undefined`
+#####Aliases
+######offChange()
+#####Example
+
+```javascript
+var flux = new Quantum();
+
+var store = {};
+
+flux.register(store, function () {});
+
+var f = function () { /*...*/ };
+
+store.addChangeListener(f);
+
+//stop listening to this store's change event with `f`
+store.removeChangeListener(f);
+```
+--
+###Store.changed
+`Store.changed([args])`
+
+--
+#####Description
+A convenience method for:
+
+```javascript
+Store.emit('change', /* [args] */);
+```
+#####Parameters
+Name | Type | Description
+--- | --- | --- |
+`args...` | `any` | Optional arguments to pass to event listeners for the change event.
+#####Returns
+`undefined`
+
+#####Example
+
+```javascript
+var flux = new Quantum();
+var store = {};
+
+flux.register(store, function (payload) {
+  if (payload.isRelevantToThisStore) {
+
+    //it updates the store appropriately.
+
+    this.changed();
+  }
+})
+
+store.onChange(/*...etc...*/);
+```
+
+##Advanced APIs
+
+###Quantum.setImmediate
+`Quantum.setImmediate(func)`
+
 --
 #####Description
 Preempt the next dispatch in the dispatch queue with the async evaluation of `func`.  A browser repaint will be allowed both before and after `func` is evaluated, then dispatching will continue in it's "natural"* order.  If `func` dispatches an action with Quantum.dispatch(), that dispatch will also precede the natural queue order...and so on.
@@ -214,7 +373,9 @@ It's important to remember that the `quantum-flux` dispatcher supports recursive
   //logged synchronously
   //executed asynchronously, but still in order
 ```
-###Quantum._interlace()_
+###Quantum.interlace
+`Quantum.interlace()`
+
 --
 #####Description
 Use maximum thread-sharing when processing flux-store dispatch digestion.  This will increase the number of browser repaints available and/or allow other javascript processes (such as timers) to run while stores digest the current dispatch.
@@ -237,7 +398,9 @@ By default, the __quantum-flux__ dispatcher only thread-shares when processing a
   
 ```
 
-###Quantum._deInterlace()_
+###Quantum.deInterlace
+`Quantum.deInterlace()`
+
 --
 #####Description
 Turn off thread-interlacing if it has been enabled, otherwise has no effect. Interlacing is __disabled__ by default.
@@ -255,179 +418,9 @@ Turn off thread-interlacing if it has been enabled, otherwise has no effect. Int
   flux.deInterlace();
   
 ```
-####Create a new flux instance for your application:
 
-```javascript
+##Contributing to Quantum Flux
 
-  var quantum = require('quantum-flux');
-  
-  var flux = new quantum.FluxInstance();
-  
-  //dispatch a payload, it can be anything, though you'll probably prefer to use objects.
-
-  flux.dispatch('hello, quantum flux!');
-
-```
-
-####Create a new store:
-
-Any properties attached to the config object passed into the flux.Store constructor are attached to `this` store.
-  
-```javascript
-  //If you just need a quick store...
-  var aStore = new flux.Store();
-  
-  //Probably you'll eventually need to do something more complex,
-  //the flux.Store constructor will extend the store with any properties passed it via a `conf` object.
-  
-  //We define the property `foo`, `funcB`, and `funcA` for `myStore` instance.
-  var myStore = new flux.Store({
-    foo: "bar",
-    funcB: function () {/*...*/},
-    funcA: function (payload) {
-      //do something with the payload!
-      
-      //Store objects share the EventEmitter prototype -- they can emit events and attach listeners!
-      this.emit('change', /*args to pass to this event*/);
-    }
-  });
-```
-####Registering and unregistering a store:
-
-Now register this store and a listener function to the flux dispatcher!
-```javascript
-
-  var myStore = new flux.Store();
-  
-  //Note: the registered function will be called with `myStore` as the `this` value.
-  myStore.register(function (payload) {
-    this.emit('change');
-  });
-  
-  //You can change or swap the registered function at any time and it takes effect immediately!
-  myStore.register(myStore.funcA);
-  
-  //you can also unregister a store, the dispatcher will no longer send dispatches to this store.
-  myStore.unregister();
-```
-
-####Stores are EventEmitters:
-
-```javascript
-
-  myStore.addListener('change', function listener(e /*, ...args */) {
-    
-    //have your View-controller do something in response to the event.
-    
-    myStore.removeListener(listener);  //You probably don't need to do this, but you can...
-    
-  });
-  
-  
-```
-
-####Waiting for other Stores:
-
-Stores can wait for another store or stores.
-
-```javascript
-
-var storeA = new flux.Store(),
-  storeB = new flux.Store();
-  
-  storeA.register(function (payload) {
-    
-    switch (payload.someCondition) {
-    
-      case foo:
-        this.waitFor(storeB /* or an [ ] of stores! */, function onFulfilled (payload) {
-        
-          //do something now that storeB is done
-        
-          this.emit('change');
-        }, function onError (e) {
-        
-          //do whatever in case there was an error in storeB
-        });
-        break;
-        
-      default:
-        return;
-    }
-    
-  });
-  
-```
-
-####All emits that occured during a dispatch phase are handled, in registration order, synchronously.
-
-When a store calls `this.emit(e, [args])`, that call is tied into to the dispatch phase/cycle...sort of like the way
-machine guns on WWI aircraft were linked to the engine cycle, to avoid shooting off the propellor.  This is also similar to the way that AngularJS's $setTimeout function is tied into the Angular digest cycle, for those familiar with Angular.
-
-`emit` calls are queued and fired in order synchronously, so we never have to worry about a browser redraw occuring between the point where all the stores have completed processing the dispatch and all listeners of those stores have executed their callbacks.
-
-This is difficult to explain in words but consider this sample output--
-  (stores are A,B,C,D,E --registered with the dispatcher in that order, and each store has 1 listener):
-
-```
-**CREATED NEW STORE** :: 97f68250-18f0-11e4-b902-bd789b968062
-**CREATED NEW STORE** :: 97f83000-18f0-11e4-b902-bd789b968062
-**CREATED NEW STORE** :: 97f83001-18f0-11e4-b902-bd789b968062
-**CREATED NEW STORE** :: 97f83002-18f0-11e4-b902-bd789b968062
-**CREATED NEW STORE** :: 97f83003-18f0-11e4-b902-bd789b968062
-**CREATED NEW STORE** :: 97f83004-18f0-11e4-b902-bd789b968062
-
-
-Dispatching payload: 1
-Dispatching payload: 2
-Dispatching payload: 3
-Dispatching payload: 4
-Dispatching payload: 5
-
-
-
- NEXT DISPATCH PHASE BEGINS -- PAYLOAD IS: 1
-
-
- The payload was "1" so D dispatched the payload "9"
-
- B waited for D
-
- The payload was '1' so B dispatched the payload '7'
-
- A waited for B
-
- The payload was "1" so B dispatched payload "8"
-
- E waited for D,B,C
-
-Listener of A reporting. Payload was: 1
-Listener of B reporting. Payload was: 1
-Listener of C reporting. Payload was: 1
-Listener of D reporting. Payload was: 1
-Listener of E reporting. Payload was: 1
-```
-
-There shouldn't be dependency on side effects between listeners of separate stores for the same event.
-
-We see in the sample flow above that regardless of who waited on who, all stores have completed their updates by the time any 
-listeners have received the corresponding change events.  Also the listeners of each particular store are fired in store-dispatch registration order.
-
-The important point here is that you should avoid creating implicit dependencies between listeners of separate stores for the
-same event.  I.e., the `Listener of A` above, shouldn't have a dependency on any action performed by `Listener of B` and vice versa.  If you do have a need for those dependencies, consider handling them by dispatching the appropriate events through the dispatcher.
-
-####Finally, if you really want to get crazy, you can extend from the Store.prototype:
-
-```javascript
-
-function myCustomComplicatedStore {
-
-//Yadda, yadda, yadda...
-
-}
-
-favoriteExtendFunc(myCustomComplicatedStore.prototype, flux.Store.prototype);
-
-//Wha-la.
-```
-
+* 2 space indentation
+* 80 columns
+* Include unit tests in your pull requests
