@@ -54,7 +54,7 @@ A full introduction to Flux Architecture can be found @ http://facebook.github.i
 
 Because all actions in an application propogate to the application dispatcher, which in turn funnels them universally to all application stores, there is a natural single-thread processing bottleneck that will occur as an application grows. 
 
-In a hypothetically large application with many stores and many more actions, it begins to make sense to think about the idea of _*non-blocking*_ dispatch resolution, enabling Javascript based-timers, CSS animations, and UI interactions to continue while the dispatch phase of a flux-cycle complete.
+In a hypothetically large application with many stores and many more actions, it begins to make sense to think about the idea of _**non-blocking**_ dispatch resolution, enabling Javascript based-timers, CSS animations, and UI interactions to continue while the dispatch phase of a flux-cycle complete.
 
 An asynchronous dispatcher would allow the application to queue up additional call to the dispatcher (even recursive calls) processing them asynchronously, while ensuring that stores own change event handlers were themselves called synchronously and in the correct total ordering of events.
 
