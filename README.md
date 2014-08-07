@@ -12,7 +12,7 @@
 
 ###Table of Contents
   + [Introduction](http://github.com/sterpe/quantum-flux/blob/master/README.md#introduction)
-  + [Why quantum-flux?](http://github.com/sterpe/quantum-flux/blob/master/README.md#why-quantumflux)
+  + [Why quantum-flux?](http://github.com/sterpe/quantum-flux/blob/master/README.md#why-quantum-flux)
   + [Basic Usage](http://github.com/sterpe/quantum-flux/blob/master/README.md#basic-usage)
   + [API Documentation](http://github.com/sterpe/quantum-flux/blob/master/README.md#api-documentation)
     + [Dispatcher] (http://github.com/sterpe/quantum-flux/blob/master/README.md#the-dispatcher)
