@@ -2,7 +2,7 @@
 
 ====
 
-[![Build Status](https://travis-ci.org/sterpe/quantum-flux.svg?branch=master)](https://travis-ci.org/sterpe/quantum-flux)
+[![Build Status](http://travis-ci.org/sterpe/quantum-flux.svg?branch=master)](http://travis-ci.org/sterpe/quantum-flux)
 
 
 ###Installation
@@ -11,26 +11,26 @@
 ```
 
 ###Table of Contents
-  + [Introduction](https://github.com/sterpe/quantum-flux/blob/master/README.md#introduction)
+  + [Introduction](http://github.com/sterpe/quantum-flux/blob/master/README.md#introduction)
   + [Why quantum-flux?](http://github.com/sterpe/quantum-flux/blob/master/README.md#why-quantumflux)
-  + [Basic Usage](https://github.com/sterpe/quantum-flux/blob/master/README.md#basic-usage)
-  + [API Documentation](https://github.com/sterpe/quantum-flux/blob/master/README.md#api-documentation)
-    + [Dispatcher] (https://github.com/sterpe/quantum-flux/blob/master/README.md#the-dispatcher)
-      + [Quantum.constructor()] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantum)
-      + [Quantum.dispatch(payload)] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantumdispatch)
-      + [Quantum.register(store, listener)] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantumregister)
-      + [Quantum.unregister(store)](https://github.com/sterpe/quantum-flux/blob/master/README.md#quantumunregister)
-    + [Stores] (https://github.com/sterpe/quantum-flux/blob/master/README.md#the-stores)
-      + [About Stores] (https://github.com/sterpe/quantum-flux/blob/master/README.md#about-stores)
-      + [Store.waitFor([stores], onFulfilled, onRejected)] (https://github.com/sterpe/quantum-flux/blob/master/README.md#storewaitfor)
-      + [Store.addChangeListener(func)] (https://github.com/sterpe/quantum-flux/blob/master/README.md#storeaddchangelistener)
-      + [Store.removeChangeListener(func)] (https://github.com/sterpe/quantum-flux/blob/master/README.md#storeremovechangelistener)
-      + [Store.changed([args])] (https://github.com/sterpe/quantum-flux/blob/master/README.md#storechanged)
-    + [Advanced APIs] (https://github.com/sterpe/quantum-flux/blob/master/README.md#advanced-apis)
-      + [Quantum.setImmediate(func)] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantumsetimmediate)
-      + [Quantum.interlace()] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantuminterlace)
-      + [Quantum.deInterlace()] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantumdeinterlace)
-  + [Contributing to Quantum Flux] (https://github.com/sterpe/quantum-flux/blob/master/README.md#contributing-to-quantum-flux)
+  + [Basic Usage](http://github.com/sterpe/quantum-flux/blob/master/README.md#basic-usage)
+  + [API Documentation](http://github.com/sterpe/quantum-flux/blob/master/README.md#api-documentation)
+    + [Dispatcher] (http://github.com/sterpe/quantum-flux/blob/master/README.md#the-dispatcher)
+      + [Quantum.constructor()] (http://github.com/sterpe/quantum-flux/blob/master/README.md#quantum)
+      + [Quantum.dispatch(payload)] (http://github.com/sterpe/quantum-flux/blob/master/README.md#quantumdispatch)
+      + [Quantum.register(store, listener)] (http://github.com/sterpe/quantum-flux/blob/master/README.md#quantumregister)
+      + [Quantum.unregister(store)](http://github.com/sterpe/quantum-flux/blob/master/README.md#quantumunregister)
+    + [Stores] (http://github.com/sterpe/quantum-flux/blob/master/README.md#the-stores)
+      + [About Stores] (http://github.com/sterpe/quantum-flux/blob/master/README.md#about-stores)
+      + [Store.waitFor([stores], onFulfilled, onRejected)] (http://github.com/sterpe/quantum-flux/blob/master/README.md#storewaitfor)
+      + [Store.addChangeListener(func)] (http://github.com/sterpe/quantum-flux/blob/master/README.md#storeaddchangelistener)
+      + [Store.removeChangeListener(func)] (http://github.com/sterpe/quantum-flux/blob/master/README.md#storeremovechangelistener)
+      + [Store.changed([args])] (http://github.com/sterpe/quantum-flux/blob/master/README.md#storechanged)
+    + [Advanced APIs] (http://github.com/sterpe/quantum-flux/blob/master/README.md#advanced-apis)
+      + [Quantum.setImmediate(func)] (http://github.com/sterpe/quantum-flux/blob/master/README.md#quantumsetimmediate)
+      + [Quantum.interlace()] (http://github.com/sterpe/quantum-flux/blob/master/README.md#quantuminterlace)
+      + [Quantum.deInterlace()] (http://github.com/sterpe/quantum-flux/blob/master/README.md#quantumdeinterlace)
+  + [Contributing to Quantum Flux] (http://github.com/sterpe/quantum-flux/blob/master/README.md#contributing-to-quantum-flux)
 
 ###Introduction
 __Flux__ is the data-flow architecture associated with the React UI Framework.  In brief it proposes an application composed of three major parts: the dispatcher, it's stores, and their views (React Components).
