@@ -58,7 +58,7 @@ An asynchronous dispatcher would allow the application to queue up additional ca
 
 In effect we enforce a total state transition between two phases: a dispatch or "action" phase and the render or "react" phase.  It looks something like this:
 
-```bash
+```http
                                                         
            An action occurs,                                        
             moving application into a still                 Application state (all stores)
