@@ -35,7 +35,7 @@ __Flux__ is the data-flow architecture associated with the React UI Framework.  
 
 Data flows through such an application in a single, cyclic, direction:
 
-```
+```nix
 Views ---> (actions) ---> Dispatcher ----> (callback) ----> Stores ----+
 ^                                                                      |
 |                                                                      V
