@@ -81,7 +81,7 @@ Views ---> (actions) ---> Dispatcher ----> (callback) ----> Stores ----+
  1x BROWSER REPAINT, STATE B
 
 ```
-This is _**quantum-flux**_.
+This is _**quantum-flux**_.  The synchronous resolution of the "react phase" ensures that change-induced UI repaints remain atomic and correctly ordered, just as they would be in a pure synchronous dispatcher implementation, while supporting thread-sharing during the asynchronous "action phase", where-in stores update their internal state in response to the dispatched action.
 
 ###Basic Usage
 
