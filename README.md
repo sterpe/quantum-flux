@@ -5,12 +5,12 @@
 [![Build Status](https://travis-ci.org/sterpe/quantum-flux.svg?branch=master)](https://travis-ci.org/sterpe/quantum-flux)
 
 
-###Installation:
+###Installation
 ```
   npm install quantum-flux
 ```
 
-###Table of Contents:
+###Table of Contents
   + [Basic Usage](https://github.com/sterpe/quantum-flux/blob/master/README.md#basic-usage)
   + [API Documentation](https://github.com/sterpe/quantum-flux/blob/master/README.md#api-documentation)
     + [Dispatcher] (https://github.com/sterpe/quantum-flux/blob/master/README.md#the-dispatcher)
@@ -30,7 +30,58 @@
       + [Quantum.deInterlace()] (https://github.com/sterpe/quantum-flux/blob/master/README.md#quantumdeinterlace)
   + [Contributing to Quantum Flux] (https://github.com/sterpe/quantum-flux/blob/master/README.md#contributing-to-quantum-flux)
 
-###Basic Usage:
+###Introduction
+__Flux__ is the data-flow architecture associated with the React UI Framework.  In brief it proposes an application composed of three major parts: the dispatcher, it's stores, and their views (React Components).
+
+Data flows through such an application in a single, cyclic, direction:
+
+```
+Views ---> (actions) ---> Dispatcher ----> (callback) ----> Stores ----+
+^                                                                      |
+|                                                                      V
++--------( "change" event handlers) <------ ("change" events) ---------+
+```
+
+Views generate actions, propogated to a dispatcher, the dispatcher informs
+data stores about the event and they update themselves appropriately, stores
+fire "change" events which views listen to vis-a-vis event handlers and so on...a single glorious cycle.
+
+A full introduction to Flux Architecture can be found @ http://facebook.github.io/react/docs/flux-overview.html 
+
+###Why quantum-flux?
+
+Because all actions in an application propogate to the application dispatcher, which in turn funnels them universally to all application stores, there is a natural single-thread processing bottleneck that will occur as an application grows. 
+
+In a hypothetically large application with many stores and many more actions, it begins to make sense to think about the idea of _asynchronous_ dispatch resolution, enabling Javascript based-timers, CSS animations, and UI interactions to continue while the dispatch phase of a flux-cycle complete.
+
+An asynchronous dispatcher would allow the application to queue up additional call to the dispatcher (even recursive calls) processing them asynchronously, while ensuring that stores own change event handlers were themselves called synchronously and in the correct total ordering of events.
+
+In effect we enforce a total state transition between two phases: a dispatch or "action" phase and the render or "react" phase.  It looks something like this:
+
+```
+                                                        
+           An action occurs,                                        
+            moving application into a still                 Application state (all stores)
+            resolving state that is neither               is now fully transitioned from 
+              fully A nor B                                     state A to B.
+              |                   --->                               |  
+              |       -->> Asynchronous Resolution Phase -->         |
+   STATE  A   |                           -->                        |     STATE B
+              V          (ACTION/FLUX  PHASE)                        V  (REACT PHASE) 
+Views ---> (actions) ---> Dispatcher ----> (callback) ----> Stores ----+
+^                                                                      |   
+|                                                                      V
++--------( "change" event handlers) <------ ("change" events) ---------+
+   ^
+   |                <-- Synchronous Resolution Phase <--
+   |
+  (END REACT PHASE)
+ 1x BROWSER REPAINT, STATE B
+
+```
+This is _**quantum-flux**_.
+
+###Basic Usage
 
 ```javascript
   //Create a flux dispatcher. ********************************************
