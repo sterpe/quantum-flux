@@ -19,7 +19,12 @@
   "dependencies": {
     "lodash": "^2.4.1",
     "q": "^1.0.1",
-    "node-uuid": "^1.4.1"
+    "node-uuid": "^1.4.1",
+    "extend": "^2.0.0",
+    "through2": "^0.6.3",
+    "labeled-stream-splicer": "^1.0.0",
+    "setimmediate": "^1.0.2",
+    "invariant": "^1.0.2"
   },
   "devDependencies": {
     "jsdoc": "^3.3.0-alpha9",
@@ -32,7 +37,7 @@
     "browserify": "^5.9.1",
     "phantomjs": "^1.9.7-15",
     "mocha-phantomjs": "^3.5.0",
-    "tape": "^2.13.4",
+    "tape": "^3.0.0",
     "testling": "^1.7.0"
   },
   "testling": {
