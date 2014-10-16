@@ -14,7 +14,7 @@
   "license": "MIT",
   "main": "lib/flux.js",
   "scripts": {
-    "test": "tape test/*.js"
+    "test": "node test/tape.js"
   },
   "dependencies": {
     "lodash": "^2.4.1",
